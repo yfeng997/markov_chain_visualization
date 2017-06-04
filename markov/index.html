@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Markov Chains</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link href="style.css" type="text/css" rel="stylesheet">
+  <script src="d3.v3.js" charset="utf-8"></script>
+  <script src="vector.js"></script>
+  <script src="angular.min.js" charset="utf-8"></script>
+  <style>
+    body {
+      background-color: #222;
+      color: white;
+    }
+
+    .st-diagram {
+      pointer-events: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      z-index: 1;
+    }
+    .st-diagram .nodes {
+      pointer-events: all;
+    }
+    .matrixInput {
+      display: block;
+      height: 100%;
+      width: 40%;
+      right: 0;
+      top: 20px;
+      position: absolute;
+    }
+    .matrixInput textarea{
+      border: none;
+      background-color: transparent;
+      color: white;
+      width: 100%;
+      height: 100%;
+      font-size: 18px;
+      outline: none;
+    }
+    .statesNameInput {
+      display: block;
+      height: 100%;
+      width: 40%;
+      left: 20px;
+      top: 20px;
+      position: absolute;
+    }
+    .statesNameInput textarea{
+      border: none;
+      background-color: transparent;
+      color: white;
+      width: 100%;
+      height: 100%;
+      font-size: 18px;
+      outline: none;
+    }
+    .matrixInput textarea.valid {
+      color: white;
+    }
+    .matrix table {
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      table-layout: fixed;
+    }
+    .matrix table td {
+      width: 33.33%;
+    }
+    .matrix table td input {
+      pointer-events: all;
+      width: 80%;
+    }
+  </style>
+</head>
+<body ng-app="myApp" ng-controller="MainCtrl">
+  <st-diagram center="diagramCenter" states="states"
+  transition-matrix="transitionMatrix" duration="duration"
+  selected-transition="selectedTransition"></st-diagram>
+</div>
+<div class="matrixInput">
+  <textarea ng-class="{ 'valid' : validTransitionMatrix }"
+  ng-model="transitionMatrixJSON">{{transitionMatrix | json}}</textarea>
+</div>
+<div class="statesNameInput">
+  <textarea ng-model="nameMatrixJSON" 
+  placeholder='Enter labels for all states in the following format: 
+  ["StateA", "StateB"]'>{{nameMatrix}}</textarea>
+</div>
+</body>
+
+<script>
+
+  var myApp = angular.module('myApp', []);
+
+  myApp.controller('MainCtrl', function($scope, utils, $window) {
+    angular.element($window).on('resize', function() { $scope.$apply(); });
+    $scope.diagramCenter = [0.5, 0.5];
+    $scope.isSelectedTransition = function(i, j) {
+      return !!$scope.selectedTransition;
+      if (!$scope.selectedTransition) return false;
+      return $scope.selectedTransition[0] === i
+      && $scope.selectedTransition[1] === j;
+    };
+    $scope.speedRange = 2;
+    $scope.$watch('speedRange', function(speed) {
+      $scope.duration = 2000 / +speed;
+    });
+
+  // Read in the names of all states 
+  $scope.nameMatrixJSON = JSON.stringify($scope.nameMatrix);
+  var grammarBook;
+  $scope.$watch('nameMatrixJSON', function(str) {
+    try{
+      grammarBook= JSON.parse(str);
+      $scope.nameMatrix = grammarBook;
+      if(Object.keys(grammarBook).length == $scope.transitionMatrix.length){
+        var hash = utils.getHash();
+        var tm;
+        if(hash)
+          tm = hash.tm;
+        utils.setHash({ tm: tm, grammar: grammarBook});
+      } 
+    } catch(e) {}
+  });
+
+  $scope.updateTransitionMatrix = function(matrix) {
+    var prev = $scope.transitionMatrix;
+    $scope.transitionMatrix = matrix;
+    if(!$scope.states || matrix.length !== prev.length) {
+      $scope.states = matrix.map(function(d, i) {
+        if(grammarBook && i < Object.keys(grammarBook).length){
+          return { label: grammarBook[i], index: i };
+        } else {
+          return { label: String.fromCharCode(65 + i), index: i};
+        }
+      });
+    }
+    // Session Storage for page refreshing
+    var grammar;
+    var hash = utils.getHash();
+    if(hash && hash.grammar) grammar = hash.grammar;
+    utils.setHash({ tm: matrix, grammar: grammar });
+  };
+
+  var hash = utils.getHash();
+  if(hash && hash.grammar) {
+    grammarBook = hash.grammar;
+    $scope.nameMatrix = hash.grammar;
+  }
+  if(hash && hash.tm) $scope.updateTransitionMatrix(hash.tm);
+  else $scope.updateTransitionMatrix([
+    [0.5, 0.5],
+    [0.5, 0.5]
+    ]);
+
+  // Validify the inputted matrix
+$scope.transitionMatrixJSON = JSON.stringify($scope.transitionMatrix)
+  .replace(/\],/gm, '],\n');
+$scope.$watch('transitionMatrixJSON', function(str) {
+  var valid = false;
+  try{ 
+      // Parse from string to a matrix
+      var matrix = JSON.parse(str);
+      valid = matrix[0].length === matrix.length;
+      var sum = matrix.reduce(function(c, row) {
+        return c + row.reduce(function(p, c){ return p + c; }, 0);
+      }, 0);
+      var r = sum / matrix.length;
+      // valid = valid && r < (1 + 1e-9) && r > (1 - 1e-9);
+      if (valid) {
+        $scope.updateTransitionMatrix(matrix);
+      }
+    }catch(e) {}
+    $scope.validTransitionMatrix = valid;
+  });
+});
+</script>
+<script src="common.js" charset="utf-8"></script>
+</html>
+
