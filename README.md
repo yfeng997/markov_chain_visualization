@@ -1,17 +1,17 @@
 
 
-#Markov Visualization
+## Markov Visualization
 ---
 
-###Purpose
+### Purpose
 
 This local web application is built to represent a Markov Chain graphically. More specifically, users can get a visual representation of the Markov Chain by inputting any **transition matrix** and specifying the labels for all states. 
 
-###Build
+### Build
 
 To build and deploy the website, simply locate the *index.html* file inside the *markov* folder and open it with any web browser. A demo version of the visualization will show up. 
 
-###How to use
+### How to use
 
 The web app has three major sections. 
 > Right hand side
@@ -25,11 +25,11 @@ The web app has three major sections.
 
 **Important:** After inputting the Transition matrix and the array of state names, **refresh** the page in order to view the result. 
 
-###Example
+### Example
 
 <img src="https://github.com/YuansongFeng/markov_chain_visualization/blob/master/screenshot/demo.png?raw=true" width="500">
 
-###Attribution
+### Attribution
 
 This application is built upon the foundation of [Setosa Markov Chain](http://setosa.io/blog/2014/07/26/markov-chains/index.html), a web application built with Angular JS and D3 JS. 
 
