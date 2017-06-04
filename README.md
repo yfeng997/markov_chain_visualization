@@ -1,7 +1,6 @@
 
 
 ## Markov Visualization
----
 
 ### Purpose
 
@@ -14,13 +13,13 @@ To build and deploy the website, simply locate the *index.html* file inside the 
 ### How to use
 
 The web app has three major sections. 
-> Right hand side
+> Right hand side: 
 > Input the Transition matrix of the Markov Chain. Node that the number of columns must equal to number of rows. 
 
-> Left hand side
+> Left hand side: 
 > Input a String array containing names of all states. Note that the length of this array should match the column number of the Transition matrix. 
 
-> Middle ground
+> Middle ground: 
 > This is where the visual representation will show up. 
 
 **Important:** After inputting the Transition matrix and the array of state names, **refresh** the page in order to view the result. 
