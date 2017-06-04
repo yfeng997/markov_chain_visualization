@@ -26,7 +26,7 @@ The web app has three major sections.
 
 ### Example
 
-<img src="https://github.com/YuansongFeng/markov_chain_visualization/blob/master/screenshot/demo.png?raw=true" width="500">
+<img src="https://github.com/YuansongFeng/markov_chain_visualization/blob/master/screenshot/demo.png?raw=true" width="800">
 
 ### Attribution
 
